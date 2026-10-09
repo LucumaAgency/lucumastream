@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overlay preguntas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --tt-cyan:#25F4EE; --tt-red:#FE2C55; --tt-black:#161823; }
+  html,body{margin:0;background:transparent;font-family:Inter,system-ui,sans-serif;overflow:hidden}
+  .stage{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:0 0 12vh}
+  .stage.top{align-items:flex-start;padding-top:12vh}
+  .card{
+    position:relative;width:min(88vw,520px);background:#fff;color:var(--tt-black);
+    border-radius:22px;padding:18px 20px 20px;box-shadow:0 12px 40px rgba(0,0,0,.35);
+    transform:translateY(40px) scale(.96);opacity:0;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .35s;
+  }
+  .card.in{transform:none;opacity:1}
+  .card::before{content:"";position:absolute;inset:-3px;border-radius:25px;z-index:-1;
+    background:linear-gradient(135deg,var(--tt-cyan),var(--tt-red));}
+  .head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--tt-black);color:#fff;display:grid;place-items:center;
+    font-weight:800;font-size:15px;position:relative;flex:none}
+  .avatar::after{content:"";position:absolute;inset:-3px;border-radius:50%;z-index:-1;
+    background:linear-gradient(135deg,var(--tt-cyan),var(--tt-red))}
+  .user{font-weight:600;font-size:15px;line-height:1.1}
+  .user small{display:block;font-weight:500;font-size:12px;color:#6a6b73;margin-top:2px}
+  .badge{margin-left:auto;background:#f1f1f3;color:var(--tt-black);font-weight:800;font-size:12px;letter-spacing:.5px;
+    padding:6px 10px;border-radius:999px;display:flex;align-items:center;gap:6px}
+  .badge i{width:8px;height:8px;border-radius:50%;background:var(--tt-red);box-shadow:0 0 0 3px rgba(254,44,85,.25)}
+  .q{font-weight:800;font-size:clamp(20px,2.6vw,27px);line-height:1.25;letter-spacing:-.2px;word-break:break-word}
+  .q::before{content:"Q";display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;margin-right:9px;
+    background:var(--tt-black);color:#fff;font-size:15px;vertical-align:3px}
+  .foot{margin-top:12px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#6a6b73;font-weight:600}
+  .foot b{color:var(--tt-red)}
+  .shake{animation:pop .5s}
+  @keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.03)}100%{transform:none}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="card" id="card" hidden>
+    <div class="head">
+      <div class="avatar" id="avatar">LA</div>
+      <div class="user"><span id="autor">Lucuma Agency</span><small id="tema"></small></div>
+      <div class="badge"><i></i>PREGUNTA</div>
+    </div>
+    <div class="q" id="texto"></div>
+    <div class="foot"><span>Responde en los comentarios</span><span><b>●</b> EN VIVO</span></div>
+  </div>
+</div>
+<script>
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('pos') === 'top') stage.classList.add('top');
+  const card = document.getElementById('card');
+  let actualId = null;
+  function render(a) {
+    if (!a) { card.classList.remove('in'); setTimeout(() => { if (!actualId) card.hidden = true; }, 400); actualId = null; return; }
+    const cambio = a.id !== actualId; actualId = a.id;
+    texto.textContent = a.texto;
+    autor.textContent = a.autor || 'Lucuma Agency';
+    tema.textContent = a.tema ? '#' + a.tema.replace(/\s+/g, '') : '@lucuma.agency';
+    avatar.textContent = (a.autor || 'LA').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    card.hidden = false;
+    requestAnimationFrame(() => { card.classList.add('in'); if (cambio) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } });
+  }
+  function conectar() {
+    const es = new EventSource('/api/stream');
+    es.onmessage = e => render(JSON.parse(e.data).activa);
+    es.onerror = () => { es.close(); setTimeout(conectar, 2000); };
+  }
+  conectar();
+</script>
+</body>
+</html>
