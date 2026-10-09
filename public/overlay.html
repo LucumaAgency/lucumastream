@@ -70,6 +70,11 @@
     es.onerror = () => { es.close(); setTimeout(conectar, 2000); };
   }
   conectar();
+  // Respaldo por si el proxy bloquea SSE: sondeo cada 3 s
+  setInterval(async () => {
+    try { const r = await fetch('/api/activa', { cache: 'no-store' }); const { activa } = await r.json();
+      if ((activa && activa.id) !== actualId || (activa && activa.texto !== texto.textContent)) render(activa); } catch (_) {}
+  }, 3000);
 </script>
 </body>
 </html>

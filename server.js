@@ -61,7 +61,7 @@ const clean = s => String(s || '').trim().slice(0, 300);
 app.get('/api/preguntas', (req, res) => res.json({ preguntas: state.preguntas, activaId: state.activaId }));
 app.get('/api/activa', (req, res) => res.json({ activa: activa() }));
 app.get('/api/stream', (req, res) => {
-  res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
+  res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
   res.flushHeaders();
   res.write(`data: ${JSON.stringify({ activa: activa(), total: state.preguntas.length })}\n\n`);
   clients.add(res);
