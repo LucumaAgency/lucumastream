@@ -11,7 +11,7 @@ App Node que muestra en pantalla, durante un TikTok Live, preguntas preparadas p
 | Overlay | https://lucumastream.pruebalucuma.site/overlay.html | Fuente de navegador en OBS (fondo transparente) |
 | API | https://lucumastream.pruebalucuma.site/api/... | Cargar preguntas por script / desde Claude |
 
-Repo: https://github.com/LucumaAgency/lucumastream · Código local: `/home/claude-user/lucuma/tiktok-live`.
+Repo: https://github.com/LucumaAgency/lucumastream · Código local: `/home/claude-user/lucumastream`.
 
 ## 2. Uso en un live
 1. Abrir el panel. El campo "Token admin" (arriba a la derecha) debe tener el token; queda guardado en el navegador.
@@ -25,7 +25,7 @@ La card solo se ve cuando hay una pregunta activa. Si OBS no muestra nada: compr
 - **Panel**: textarea "Agregar preguntas", una por línea, tema y autor opcionales.
 - **Script** (desde esta máquina, usa `~/.lucumastream.env`):
   ```
-  cd /home/claude-user/lucuma/tiktok-live
+  cd /home/claude-user/lucumastream
   ./agregar.sh "SEO" <<'EOF'
   ¿Pregunta uno?
   ¿Pregunta dos?
